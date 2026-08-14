@@ -1,5 +1,6 @@
 "use client";
 import { Pyramid } from 'lucide-react';
+import Link from 'next/link'
 
 export default function LoginCard() {
   return (
@@ -41,13 +42,13 @@ export default function LoginCard() {
         {/* Terms */}
         <p className="mt-4 text-center text-xs leading-relaxed text-neutral-400 px-12">
           By clicking continue, you agree to our{" "}
-          <a href="#" className="underline underline-offset-2 hover:text-neutral-600">
+          <Link href="#" className="underline underline-offset-2 hover:text-neutral-600">
             Terms of Service
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a href="#" className="underline underline-offset-2 hover:text-neutral-600">
+          <Link href="#" className="underline underline-offset-2 hover:text-neutral-600">
             Privacy Policy
-          </a>
+          </Link>
         </p>
       </div>
     </div>
