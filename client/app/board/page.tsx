@@ -15,8 +15,6 @@ import {
   ChartNoAxesColumnIncreasing,
   List,
   X,
-} from "lucide-react";
-import {
   Filter,
   GalleryVerticalEnd,
   LayoutDashboard,
@@ -82,6 +80,7 @@ const columns: Column[] = [
 ];
 
 type Priority = "High" | "Medium" | "Low";
+type Status = "Not Started" | "In Progress" | "Done" | "Blocked";
 
 type Row = {
   task: string;
@@ -89,11 +88,15 @@ type Row = {
   member: string | null; // initials, or null for "add member"
   memberColor: string;
   dueDate: string;
+  labels: string[];
+  status: Status;
+  reporter: string;
 };
 
 type Group = {
   id: string;
   title: string;
+  status: Status;
   rows: Row[];
 };
 
@@ -103,10 +106,18 @@ const priorityStyles: Record<Priority, string> = {
   Low: "text-neutral-400",
 };
 
+const statusStyles: Record<Status, string> = {
+  "Not Started": "bg-neutral-100 text-neutral-500",
+  "In Progress": "bg-blue-50 text-blue-600",
+  Done: "bg-emerald-50 text-emerald-600",
+  Blocked: "bg-orange-50 text-orange-600",
+};
+
 const groups: Group[] = [
   {
     id: "todo",
     title: "To Do",
+    status: "Not Started",
     rows: [
       {
         task: "Design Homepage",
@@ -114,6 +125,9 @@ const groups: Group[] = [
         member: "AK",
         memberColor: "from-purple-400 to-fuchsia-500",
         dueDate: "12 Sep 2026",
+        labels: ["UI", "Design"],
+        status: "Not Started",
+        reporter: "Priya Singh",
       },
       {
         task: "Develop Login Feature",
@@ -121,6 +135,9 @@ const groups: Group[] = [
         member: "CN",
         memberColor: "from-sky-400 to-blue-500",
         dueDate: "15 Sep 2026",
+        labels: ["Backend", "Auth"],
+        status: "Not Started",
+        reporter: "Rahul Mehta",
       },
       {
         task: "Test Payment Gateway",
@@ -128,12 +145,16 @@ const groups: Group[] = [
         member: null,
         memberColor: "",
         dueDate: "18 Sep 2026",
+        labels: ["QA", "Payments"],
+        status: "Not Started",
+        reporter: "Ananya Iyer",
       },
     ],
   },
   {
     id: "doing",
     title: "Doing",
+    status: "In Progress",
     rows: [
       {
         task: "Design Homepage",
@@ -141,6 +162,9 @@ const groups: Group[] = [
         member: "AK",
         memberColor: "from-purple-400 to-fuchsia-500",
         dueDate: "12 Sep 2026",
+        labels: ["UI", "Design"],
+        status: "In Progress",
+        reporter: "Priya Singh",
       },
       {
         task: "Develop Login Feature",
@@ -148,6 +172,9 @@ const groups: Group[] = [
         member: "CN",
         memberColor: "from-sky-400 to-blue-500",
         dueDate: "15 Sep 2026",
+        labels: ["Backend", "Auth"],
+        status: "In Progress",
+        reporter: "Rahul Mehta",
       },
       {
         task: "Test Payment Gateway",
@@ -155,12 +182,16 @@ const groups: Group[] = [
         member: null,
         memberColor: "",
         dueDate: "18 Sep 2026",
+        labels: ["QA", "Payments"],
+        status: "In Progress",
+        reporter: "Ananya Iyer",
       },
     ],
   },
   {
     id: "completed",
     title: "Completed",
+    status: "Done",
     rows: [
       {
         task: "Design Homepage",
@@ -168,6 +199,9 @@ const groups: Group[] = [
         member: "AK",
         memberColor: "from-purple-400 to-fuchsia-500",
         dueDate: "12 Sep 2026",
+        labels: ["UI", "Design"],
+        status: "Done",
+        reporter: "Priya Singh",
       },
       {
         task: "Develop Login Feature",
@@ -175,6 +209,9 @@ const groups: Group[] = [
         member: "CN",
         memberColor: "from-sky-400 to-blue-500",
         dueDate: "15 Sep 2026",
+        labels: ["Backend", "Auth"],
+        status: "Done",
+        reporter: "Rahul Mehta",
       },
       {
         task: "Test Payment Gateway",
@@ -182,12 +219,16 @@ const groups: Group[] = [
         member: null,
         memberColor: "",
         dueDate: "18 Sep 2026",
+        labels: ["QA", "Payments"],
+        status: "Done",
+        reporter: "Ananya Iyer",
       },
     ],
   },
   {
     id: "onhold",
     title: "On Hold",
+    status: "Blocked",
     rows: [
       {
         task: "UI Review Pending",
@@ -195,20 +236,55 @@ const groups: Group[] = [
         member: "SD",
         memberColor: "from-emerald-400 to-teal-500",
         dueDate: "20 Sep 2026",
+        labels: ["Design", "Review"],
+        status: "Blocked",
+        reporter: "Karan Verma",
       },
     ],
   },
 ];
 
-const fieldOptions = [
-  "Priority",
-  "Members",
-  "Due Date",
-  "Members",
-  "Labels",
-  "Status",
-  "Reporter",
+type FieldId =
+  | "priority"
+  | "members"
+  | "dueDate"
+  | "labels"
+  | "status"
+  | "reporter";
+
+type FieldDef = {
+  id: FieldId;
+  label: string;
+  width: string; // px width used in the grid template
+};
+
+const fieldDefs: FieldDef[] = [
+  { id: "priority", label: "Priority", width: "110px" },
+  { id: "members", label: "Members", width: "90px" },
+  { id: "dueDate", label: "Due Date", width: "130px" },
+  { id: "labels", label: "Labels", width: "190px" },
+  { id: "status", label: "Status", width: "130px" },
+  { id: "reporter", label: "Reporter", width: "150px" },
 ];
+
+const defaultCheckedFields: Record<FieldId, boolean> = {
+  priority: true,
+  members: true,
+  dueDate: true,
+  labels: false,
+  status: false,
+  reporter: false,
+};
+
+// const fieldOptions = [
+//   "Priority",
+//   "Members",
+//   "Due Date",
+//   "Members",
+//   "Labels",
+//   "Status",
+//   "Reporter",
+// ];
 
 export default function TaskBoard() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
@@ -216,9 +292,11 @@ export default function TaskBoard() {
   const [collapsedGroups, setCollapsedGroups] = useState<
     Record<string, boolean>
   >({});
-  const [checkedFields, setCheckedFields] = useState<boolean[]>(
-    fieldOptions.map((_, i) => i === 1 || i === 3),
-  );
+  // const [checkedFields, setCheckedFields] = useState<boolean[]>(
+  //   fieldOptions.map((_, i) => i === 1 || i === 3),
+  // );
+  const [checkedFields, setCheckedFields] =
+    useState<Record<FieldId, boolean>>(defaultCheckedFields);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const fieldsRef = useRef<HTMLDivElement>(null);
@@ -243,10 +321,8 @@ export default function TaskBoard() {
     }
   }, [searchOpen]);
 
-  function toggleField(index: number) {
-    setCheckedFields((prev) =>
-      prev.map((val, i) => (i === index ? !val : val)),
-    );
+  function toggleField(id: FieldId) {
+    setCheckedFields((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   function toggleGroup(id: string) {
@@ -274,6 +350,11 @@ export default function TaskBoard() {
         }))
         .filter((group) => group.rows.length > 0)
     : groups;
+
+  const visibleFields = fieldDefs.filter((f) => checkedFields[f.id]);
+  const gridTemplateColumns = `1fr ${visibleFields
+    .map((f) => f.width)
+    .join(" ")} 80px`;
 
   return (
     <div className="flex h-screen w-full bg-white text-neutral-900">
@@ -396,26 +477,34 @@ export default function TaskBoard() {
                     </button>
                   </div>
 
-                  <div className="mt-2 flex flex-col">
-                    {fieldOptions.map((field, i) => (
-                      <button
-                        key={i}
-                        onClick={() => toggleField(i)}
-                        className="flex items-center justify-between rounded-lg px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-                      >
-                        {field}
-                        <span
-                          className={`flex h-4 w-4 items-center justify-center rounded border ${
-                            checkedFields[i]
-                              ? "border-black bg-black text-white"
-                              : "border-neutral-300 bg-white"
-                          }`}
+                  {view === "board" ? (
+                    <div className="mt-2 flex flex-col">
+                      {fieldDefs.map((field) => (
+                        <button
+                          key={field.id}
+                          onClick={() => toggleField(field.id)}
+                          className="flex items-center justify-between rounded-lg px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
                         >
-                          {checkedFields[i] && <Check className="h-3 w-3" />}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+                          {field.label}
+                          <span
+                            className={`flex h-4 w-4 items-center justify-center rounded border ${
+                              checkedFields[field.id]
+                                ? "border-black bg-black text-white"
+                                : "border-neutral-300 bg-white"
+                            }`}
+                          >
+                            {checkedFields[field.id] && (
+                              <Check className="h-3 w-3" />
+                            )}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="px-2 py-3 text-xs text-neutral-400">
+                      Column fields only apply to Board view.
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -432,13 +521,12 @@ export default function TaskBoard() {
         {/* List */}
         {view === "list" && (
           <div className="flex flex-1 gap-4 overflow-x-auto p-6">
-            {columns.map((col) => (
+            {filteredColumns.map((col) => (
               <div
                 key={col.id}
                 className="flex w-72 flex-shrink-0 flex-col bg-zinc-100 border-1 border-zinc-200 p-4 rounded-lg"
               >
                 <div className="mb-3 flex items-center gap-2 px-1">
-                  {/* <span className={`h-2 w-2 rounded-full ${col.dotColor}`} /> */}
                   <GripVertical className="w-4 h-4" />
                   <span className="text-sm font-semibold text-neutral-700">
                     {col.title}
@@ -450,6 +538,40 @@ export default function TaskBoard() {
                     <MoreHorizontal className="h-3.5 w-3.5" />
                   </button>
                 </div>
+
+                {/* <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between">
+                    <p className="text-sm font-semibold text-neutral-900">
+                      {col.task.title}
+                    </p>
+                    <MoreHorizontal className="h-4 w-4 flex-shrink-0 text-neutral-300" />
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 text-[9px] font-semibold text-white">
+                      {col.task.assignee.charAt(0)}
+                    </span>
+                    <span className="text-xs text-neutral-500">
+                      {col.task.assignee}
+                    </span>
+                    <span className="ml-auto flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-500">
+                      <Calendar className="h-3 w-3" />
+                      {col.task.date}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {col.task.tags.map((tag, i) => (
+                      <span
+                        key={i}
+                        className="flex font-bold items-center gap-1 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] text-black"
+                      >
+                        <Tag className="h-2.5 w-2.5 font-bold" />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div> */}
 
                 <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
                   <div className="flex items-start justify-between">
@@ -476,7 +598,7 @@ export default function TaskBoard() {
                     {col.task.tags.map((tag, i) => (
                       <span
                         key={i}
-                        className="flex font-bold items-center gap-1 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] text-black"
+                        className="flex items-center gap-1 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-bold text-black"
                       >
                         <Tag className="h-2.5 w-2.5 font-bold" />
                         {tag}
@@ -589,7 +711,7 @@ export default function TaskBoard() {
                     {group.title}
                   </button>
 
-                  {!collapsed && (
+                  {/* {!collapsed && (
                     <div className="overflow-hidden rounded-xl border border-neutral-200">
                       <div className="grid grid-cols-[1fr_120px_120px_140px_80px] bg-neutral-50 px-4 py-2 text-xs font-medium text-neutral-500">
                         <span>Task</span>
@@ -635,6 +757,116 @@ export default function TaskBoard() {
                         </div>
                       ))}
 
+                      <button className="flex w-full items-center gap-1.5 border-t border-neutral-100 px-4 py-2.5 text-sm text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600">
+                        <Plus className="h-3.5 w-3.5" />
+                        Add Task
+                      </button>
+                    </div>
+                  )} */}
+                  {!collapsed && (
+                    <div className="overflow-hidden rounded-xl border border-neutral-200">
+                      <div
+                        className="grid bg-neutral-50 px-4 py-2 text-xs font-medium text-neutral-500"
+                        style={{ gridTemplateColumns }}
+                      >
+                        <span>Task</span>
+                        {visibleFields.map((f) => (
+                          <span key={f.id}>{f.label}</span>
+                        ))}
+                        <span className="text-right">Actions</span>
+                      </div>
+
+                      {group.rows.map((row, i) => (
+                        <div
+                          key={i}
+                          className="grid items-center border-t border-neutral-100 px-4 py-3 text-sm hover:bg-neutral-50"
+                          style={{ gridTemplateColumns }}
+                        >
+                          <span className="text-neutral-900">{row.task}</span>
+
+                          {visibleFields.map((f) => {
+                            if (f.id === "priority") {
+                              return (
+                                <span
+                                  key={f.id}
+                                  className={`flex items-center gap-1 text-xs font-medium ${
+                                    priorityStyles[row.priority]
+                                  }`}
+                                >
+                                  <ChartNoAxesColumnIncreasing className="h-3 w-3" />
+                                  {row.priority}
+                                </span>
+                              );
+                            }
+                            if (f.id === "members") {
+                              return (
+                                <span key={f.id}>
+                                  {row.member ? (
+                                    <span
+                                      className={`flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-semibold text-white ${row.memberColor}`}
+                                    >
+                                      {row.member}
+                                    </span>
+                                  ) : (
+                                    <span className="flex h-6 w-6 items-center justify-center rounded-full border border-dashed border-neutral-300 text-neutral-400">
+                                      <Plus className="h-3 w-3" />
+                                    </span>
+                                  )}
+                                </span>
+                              );
+                            }
+                            if (f.id === "dueDate") {
+                              return (
+                                <span key={f.id} className="text-neutral-500">
+                                  {row.dueDate}
+                                </span>
+                              );
+                            }
+                            if (f.id === "labels") {
+                              return (
+                                <span
+                                  key={f.id}
+                                  className="flex flex-wrap gap-1"
+                                >
+                                  {row.labels.map((label, li) => (
+                                    <span
+                                      key={li}
+                                      className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] text-neutral-600"
+                                    >
+                                      {label}
+                                    </span>
+                                  ))}
+                                </span>
+                              );
+                            }
+                            if (f.id === "status") {
+                              return (
+                                <span key={f.id}>
+                                  <span
+                                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                                      statusStyles[row.status]
+                                    }`}
+                                  >
+                                    {row.status}
+                                  </span>
+                                </span>
+                              );
+                            }
+                            if (f.id === "reporter") {
+                              return (
+                                <span key={f.id} className="text-neutral-600">
+                                  {row.reporter}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })}
+
+                          <button className="flex justify-end text-neutral-400 hover:text-neutral-600">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
                       <button className="flex w-full items-center gap-1.5 border-t border-neutral-100 px-4 py-2.5 text-sm text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600">
                         <Plus className="h-3.5 w-3.5" />
                         Add Task

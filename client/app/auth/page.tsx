@@ -1,6 +1,6 @@
 "use client";
-import { Pyramid } from 'lucide-react';
-import Link from 'next/link'
+import { Pyramid } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginCard() {
   return (
@@ -8,8 +8,11 @@ export default function LoginCard() {
       <div className="flex w-full max-w-sm flex-col items-center px-4">
         {/* Brand */}
         <div className="mb-4 flex items-center gap-2">
-          <Pyramid size={15} className="text-white bg-black fill-none p-3 rounded-lg" />
-          <span className="text-sm font-medium text-neutral-900">Pyramid</span>
+          {/* <Pyramid size={18} className="text-white bg-black p-3 rounded-lg" /> */}
+          <div className="bg-black p-1.5 rounded-lg flex items-center justify-center">
+            <Pyramid size={14} className="text-white" />
+          </div>
+          <span className="text-sm font-bold text-black">Pyramid</span>
         </div>
 
         {/* Card */}
@@ -31,22 +34,28 @@ export default function LoginCard() {
 
             <button
               type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white py-3 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-50"
             >
-              <GoogleIcon className="h-4 w-4" />
+              <GoogleIcon className="h-4 w-4 text-black [&_path]:fill-current" />
               Login with Google
             </button>
           </div>
         </div>
 
         {/* Terms */}
-        <p className="mt-4 text-center text-xs leading-relaxed text-neutral-400 px-12">
+        <p className="mt-4 text-center text-xs leading-relaxed text-neutral-400 px-16">
           By clicking continue, you agree to our{" "}
-          <Link href="#" className="underline underline-offset-2 hover:text-neutral-600">
+          <Link
+            href="#"
+            className="underline underline-offset-2 hover:text-neutral-600"
+          >
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="#" className="underline underline-offset-2 hover:text-neutral-600">
+          <Link
+            href="#"
+            className="underline underline-offset-2 hover:text-neutral-600"
+          >
             Privacy Policy
           </Link>
         </p>
