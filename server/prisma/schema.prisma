@@ -35,6 +35,10 @@ model User {
   email     String   @unique
   avatarUrl String?
   googleId  String   @unique
+  /// bcrypt hash of the current valid refresh token, if any.
+  /// Null means logged out / no active session. Rotated on every refresh
+  /// so a stolen refresh token stops working the moment it's used once.
+  hashedRefreshToken String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

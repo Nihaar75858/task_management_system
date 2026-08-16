@@ -23,7 +23,7 @@ export class PrismaService
     // Prisma 7 has no built-in query engine — every SQL provider requires
     // an explicit driver adapter. @prisma/adapter-pg wraps `pg` for Postgres.
     const adapter = new PrismaPg({
-      connectionString: configService.get("databaseUrl", { infer: true }),
+      connectionString: configService.get('databaseUrl', { infer: true }),
     });
 
     super({ adapter });
@@ -31,7 +31,7 @@ export class PrismaService
 
   async onModuleInit() {
     await this.$connect();
-    this.logger.log("Connected to PostgreSQL via Prisma (pg adapter)");
+    this.logger.log('Connected to PostgreSQL via Prisma (pg adapter)');
   }
 
   async onModuleDestroy() {

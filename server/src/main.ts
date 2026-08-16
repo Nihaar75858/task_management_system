@@ -12,6 +12,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import type { AppConfig } from './config/configuration';
 
@@ -20,6 +21,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService<AppConfig, true>);
 
   app.setGlobalPrefix('api/v1', { exclude: ['health'] });
+
+  app.use(cookieParser());
 
   app.enableCors({
     origin: configService.get('frontendUrl', { infer: true }),
