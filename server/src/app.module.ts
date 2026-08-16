@@ -7,7 +7,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { ProjectsModule } from "./projects/projects.module";
+import { ProjectsModule } from './projects/projects.module';
+import { BoardsModule } from './boards/boards.module';
+import { ColumnsModule } from './columns/columns.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ProjectsModule } from "./projects/projects.module";
     UsersModule,
     AuthModule,
     ProjectsModule,
+    BoardsModule,
+    ColumnsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

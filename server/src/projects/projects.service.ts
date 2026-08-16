@@ -3,6 +3,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
+const DEFAULT_COLUMNS = [
+  { name: 'To Do', order: 0, colorKey: 'neutral' },
+  { name: 'Doing', order: 1, colorKey: 'blue' },
+  { name: 'Completed', order: 2, colorKey: 'emerald' },
+  { name: 'On Hold', order: 3, colorKey: 'orange' },
+];
+
+const projectListInclude = {
+  boards: { select: { id: true, name: true } },
+  lead: {
+    select: { id: true, name: true, avatarUrl: true },
+  },
+} as const;
+
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -10,9 +24,7 @@ export class ProjectsService {
   findAllForUser(userId: string) {
     return this.prisma.project.findMany({
       where: { ownerId: userId },
-      include: {
-        boards: { select: { id: true, name: true } },
-      },
+      include: projectListInclude,
       orderBy: { createdAt: 'asc' },
     });
   }
@@ -20,9 +32,7 @@ export class ProjectsService {
   async findOneForUser(id: string, userId: string) {
     const project = await this.prisma.project.findFirst({
       where: { id, ownerId: userId },
-      include: {
-        boards: { select: { id: true, name: true } },
-      },
+      include: projectListInclude,
     });
 
     // 404, not 403, on a project that exists but isn't owned by this user —
@@ -38,8 +48,18 @@ export class ProjectsService {
     return this.prisma.project.create({
       data: {
         name: dto.name,
+        priority: dto.priority,
+        leadId: dto.leadId,
+        dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
         ownerId: userId,
+        boards: {
+          create: {
+            name: 'Tasks',
+            columns: { create: DEFAULT_COLUMNS },
+          },
+        },
       },
+      include: projectListInclude,
     });
   }
 
@@ -48,7 +68,13 @@ export class ProjectsService {
 
     return this.prisma.project.update({
       where: { id },
-      data: dto,
+      data: {
+        name: dto.name,
+        priority: dto.priority,
+        leadId: dto.leadId,
+        dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      },
+      include: projectListInclude,
     });
   }
 

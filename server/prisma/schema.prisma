@@ -14,6 +14,7 @@ datasource db {
 }
 
 enum Priority {
+  URGENT
   HIGH
   MEDIUM
   LOW
@@ -43,6 +44,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   projects      Project[]      @relation("ProjectOwner")
+  ledProjects   Project[]      @relation("ProjectLead")
   reportedTasks Task[]         @relation("TaskReporter")
   assignedTasks TaskAssignee[]
 
@@ -52,8 +54,19 @@ model User {
 model Project {
   id        String   @id @default(uuid())
   name      String
+  /// Null represents "No Priority" in the frontend's filter dropdown.
+  priority Priority?
+  dueDate  DateTime?
+  
   ownerId   String
   owner     User     @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  /// The single "Lead" shown in the Projects table — distinct from
+  /// ownerId, which governs access control. A project's lead can be
+  /// reassigned to any user without changing who administratively owns it.
+  leadId String?
+  lead   User?   @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+
   boards    Board[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
