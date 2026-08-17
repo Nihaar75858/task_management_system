@@ -10,6 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { ProjectsModule } from './projects/projects.module';
 import { BoardsModule } from './boards/boards.module';
 import { ColumnsModule } from './columns/columns.module';
+import { TasksModule } from './tasks/tasks.module';
+import { LabelsModule } from './labels/labels.module';
+import { RealtimeModule } from './realtime/realtime.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { ColumnsModule } from './columns/columns.module';
     ProjectsModule,
     BoardsModule,
     ColumnsModule,
+    TasksModule,
+    LabelsModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
